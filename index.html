@@ -56,31 +56,37 @@
 
 <div class="container">
     <h1>BeatCraft AI 🎧</h1>
-    <p>Paste Lyrics & Generate Free Beats Instantly</p>
+    <p>AI Lyrics Vocal & Free Beat Generator</p>
 
-    <textarea id="prompt" rows="4" placeholder="Enter lyrics or music mood..."></textarea>
+    <textarea id="prompt" rows="4" placeholder="Write your lyrics or song prompt here..."></textarea>
     
     <select id="genre">
-        <option value="hiphop">🔥 Hip-Hop / Rap</option>
-        <option value="lofi">☕ Lo-Fi Chill</option>
-        <option value="edm">⚡ EDM / Party</option>
+        <option value="hiphop">🔥 Hip-Hop / Rap Beat</option>
+        <option value="lofi">☕ Lo-Fi Chill Beat</option>
+        <option value="edm">⚡ EDM Festival Beat</option>
     </select>
 
-    <button onclick="generateBeat()">🎵 GENERATE MUSIC</button>
+    <button onclick="generateSong()">🎵 GENERATE FULL SONG</button>
 
     <div class="audio-player" id="playerBox" style="display:none;">
-        <p style="color: #4ade80;">✨ Beat Ready!</p>
-        <audio id="audio" controls></audio>
+        <p style="color: #4ade80;">✨ Beat & Vocals Playing!</p>
+        <audio id="audio" controls loop></audio>
     </div>
 </div>
 
 <script>
-    function generateBeat() {
+    function generateSong() {
+        const lyrics = document.getElementById('prompt').value;
         const btn = document.querySelector('button');
         const playerBox = document.getElementById('playerBox');
         const audio = document.getElementById('audio');
-        
-        btn.innerText = "⚡ Creating Beat...";
+
+        if (!lyrics.trim()) {
+            alert("Pehle lyrics ya prompt toh daalo bhai!");
+            return;
+        }
+
+        btn.innerText = "⚡ Creating Song...";
         btn.disabled = true;
 
         setTimeout(() => {
@@ -95,9 +101,18 @@
             playerBox.style.display = "block";
             audio.play();
 
-            btn.innerText = "🎵 GENERATE MUSIC";
+            // AI Speech (Lyrics Vocal)
+            window.speechSynthesis.cancel(); // Reset previous speech
+            const speech = new SpeechSynthesisUtterance(lyrics);
+            speech.rate = 1.0;  // Speed
+            speech.pitch = 1.1; // Voice Pitch
+            speech.lang = 'hi-IN'; // Hindi/English blend accent
+            
+            window.speechSynthesis.speak(speech);
+
+            btn.innerText = "🎵 GENERATE FULL SONG";
             btn.disabled = false;
-        }, 1500);
+        }, 1200);
     }
 </script>
 
