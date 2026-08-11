@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeatCraft AI - Free Music Generator</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #0d0f17; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { width: 100%; max-width: 450px; background: #161925; padding: 25px; border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(0, 242, 254, 0.15); border: 1px solid #23293e; }
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h1 { font-size: 28px; color: #00f2fe; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); }
+        .header p { font-size: 13px; color: #a0a5b5; margin-top: 5px; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-size: 14px; margin-bottom: 8px; color: #4facfe; font-weight: 600; }
+        textarea, select { width: 100%; background: #0d0f17; border: 1px solid #23293e; color: #fff; padding: 12px; border-radius: 10px; font-size: 14px; outline: none; }
+        textarea:focus, select:focus { border-color: #00f2fe; box-shadow: 0 0 8px rgba(0, 242, 254, 0.3); }
+        textarea { height: 100px; resize: none; }
+        .btn-generate { width: 100%; padding: 15px; background: linear-gradient(45deg, #00f2fe, #4facfe); border: none; border-radius: 12px; color: #000; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4); }
+        .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 242, 254, 0.6); }
+        .player-section { margin-top: 25px; background: #0d0f17; padding: 15px; border-radius: 12px; border: 1px solid #23293e; text-align: center; display: none; }
+        audio { width: 100%; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>BeatCraft AI 🎧</h1>
+            <p>Paste Lyrics & Generate Free Beats Instantly</p>
+        </div>
+
+        <div class="input-group">
+            <label for="lyrics">Enter Your Lyrics / Prompt:</label>
+            <textarea id="lyrics" placeholder="Write lyrics or mood (e.g. Energetic Hip-Hop beat with heavy bass)"></textarea>
+        </div>
+
+        <div class="input-group">
+            <label for="genre">Select Music Genre:</label>
+            <select id="genre">
+                <option value="Hip-Hop Rap beat with heavy 808 bass">🔥 Hip-Hop / Rap</option>
+                <option value="Lo-fi chill aesthetic study beat">☕ Lofi / Chill Beats</option>
+                <option value="Emotional sad melody piano tune">💔 Sad / Emotional</option>
+                <option value="Upbeat pop EDM festival track">🎤 Pop / EDM</option>
+                <option value="Rock guitar heavy riff track">🎸 Rock / Metal</option>
+            </select>
+        </div>
+
+        <button class="btn-generate" onclick="generateMusic()">🎵 GENERATE MUSIC</button>
+
+        <div class="player-section" id="playerBox">
+            <p style="color:#00f2fe; font-size:14px;" id="statusMsg">Your Track is Ready! 🎉</p>
+            <audio id="audioPlayer" controls></audio>
+        </div>
+    </div>
+
+    <script>
+        async function generateMusic() {
+            const lyrics = document.getElementById('lyrics').value;
+            const genre = document.getElementById('genre').value;
+            const playerBox = document.getElementById('playerBox');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const generateBtn = document.querySelector('.btn-generate');
+            const statusMsg = document.getElementById('statusMsg');
+
+            if (!lyrics.trim()) {
+                alert("Pehle lyrics ya prompt toh daalo bhai!");
+                return;
+            }
+
+            generateBtn.innerText = "⏳ Generating AI Music (15-20 sec)...";
+            generateBtn.disabled = true;
+            playerBox.style.display = 'block';
+            statusMsg.innerText = "⚡ Creating beat with AI Engine...";
+
+            const fullPrompt = `${genre}, lyrics context: ${lyrics}`;
+
+            try {
+                const response = await fetch(
+                    "https://api-inference.huggingface.co/models/facebook/musicgen-small",
+                    {
+                        headers: { "Content-Type": "application/json" },
+                        method: "POST",
+                        body: JSON.stringify({ inputs: fullPrompt }),
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("AI Server busy hai, 5 second baad fir click karo!");
+                }
+
+                const blob = await response.blob();
+                const audioUrl = URL.createObjectURL(blob);
+                
+                audioPlayer.src = audioUrl;
+                statusMsg.innerText = "Your Track is Ready! 🎉";
+                audioPlayer.play();
+
+            } catch (error) {
+                alert("Issue aaya bhai: " + error.message);
+                statusMsg.innerText = "⚠️ Generation Failed. Retry!";
+            } finally {
+                generateBtn.innerText = "🎵 GENERATE MUSIC";
+                generateBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
+
