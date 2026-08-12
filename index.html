@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeatCraft AI</title>
+    <title>BeatCraft AI - HipHop & Sad AI Song Generator</title>
     <style>
         * {
             box-sizing: border-box;
@@ -45,7 +45,7 @@
         }
         textarea {
             width: 100%;
-            height: 120px;
+            height: 110px;
             background: #0d0f17;
             border: 1px solid #2a2f4c;
             border-radius: 12px;
@@ -59,6 +59,14 @@
         textarea:focus {
             border-color: #00f2fe;
         }
+        label {
+            display: block;
+            text-align: left;
+            font-size: 13px;
+            color: #a0a5c0;
+            margin-bottom: 5px;
+            margin-top: 10px;
+        }
         select {
             width: 100%;
             padding: 12px;
@@ -67,7 +75,7 @@
             color: #fff;
             border-radius: 12px;
             outline: none;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             font-size: 14px;
         }
         button {
@@ -79,12 +87,11 @@
             font-size: 16px;
             cursor: pointer;
             transition: 0.3s;
-        }
-        .btn-generate {
             background: linear-gradient(45deg, #4facfe, #00f2fe);
             color: #000;
+            margin-top: 15px;
         }
-        .btn-generate:disabled {
+        button:disabled {
             background: #4a506b;
             color: #888;
             cursor: not-allowed;
@@ -98,7 +105,8 @@
         .status {
             margin-top: 15px;
             font-size: 14px;
-            color: #a0a5c0;
+            color: #00f2fe;
+            word-wrap: break-word;
         }
         audio {
             width: 100%;
@@ -111,18 +119,25 @@
 
 <div class="container">
     <h1>BeatCraft AI</h1>
-    <p class="subtitle">Create AI Songs & Beats Instantly</p>
+    <p class="subtitle">Real AI Vocals & Music Studio</p>
 
-    <textarea id="lyricsInput" placeholder="Paste your song lyrics here..."></textarea>
+    <textarea id="lyricsInput" placeholder="Yahan lyrics likho..."></textarea>
 
+    <label for="genreSelect">🎶 Song Type (Gana kaisa chahiye):</label>
     <select id="genreSelect">
-        <option value="Hip-Hop / Rap">🔥 Hip-Hop / Rap</option>
-        <option value="Lo-Fi Chill">☕ Lo-Fi Chill Beat</option>
-        <option value="Aggressive Trap">⚡ Aggressive Trap</option>
-        <option value="Romantic Melodic">❤️ Romantic Melodic</option>
+        <option value="aggressive hiphop rap track with high beat">🔥 Hip-Hop / Rap</option>
+        <option value="emotional slow acoustic sad song with deep vocals">💔 Sad Song</option>
     </select>
 
-    <button id="generateBtn" class="btn-generate" onclick="generateSong()">GENERATE FULL SONG</button>
+    <label for="langSelect">🗣️ Language (Bhasha select karein):</label>
+    <select id="langSelect">
+        <option value="Hindi">🇮🇳 Hindi</option>
+        <option value="Hinglish">🎤 Hinglish (Hindi + English Mix)</option>
+        <option value="English">🇬🇧 English</option>
+        <option value="Bhojpuri">🌾 Bhojpuri</option>
+    </select>
+
+    <button id="generateBtn" onclick="generateAISong()">GENERATE AI SONG 🎤</button>
     <button id="resetBtn" class="btn-reset" onclick="resetApp()">🔄 Create Another Song</button>
 
     <div id="statusText" class="status"></div>
@@ -130,36 +145,66 @@
 </div>
 
 <script>
-    function generateSong() {
+    // Aapki Hugging Face API Key
+    const API_KEY = "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"; 
+
+    async function generateAISong() {
         const lyrics = document.getElementById('lyricsInput').value.trim();
+        const genre = document.getElementById('genreSelect').value;
+        const lang = document.getElementById('langSelect').value;
+
         const generateBtn = document.getElementById('generateBtn');
         const resetBtn = document.getElementById('resetBtn');
         const statusText = document.getElementById('statusText');
         const audioPlayer = document.getElementById('audioPlayer');
 
         if (!lyrics) {
-            alert('Bhai pehle gana/lyrics toh daalo!');
+            alert('Bhai pehle lyrics toh daalo!');
             return;
         }
 
-        // Processing UI
         generateBtn.disabled = true;
-        generateBtn.innerText = 'Creating Beat & Music... 🎵';
-        statusText.innerText = 'Generating track, please wait...';
+        generateBtn.innerText = 'AI Singer Processing... 🎤';
+        statusText.innerText = 'Generating track... (It takes 15-30 seconds)';
 
-        // Demo Audio Flow (Simulating Creation)
-        setTimeout(() => {
-            statusText.innerText = 'Song Ready! Tap play below 🔥';
-            generateBtn.innerText = 'SONG CREATED!';
-            
-            // Sample Demo Music Track
-            audioPlayer.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-            audioPlayer.style.display = 'block';
+        // Combine Genre, Language, and Lyrics for AI prompt
+        const fullPrompt = `[Style: ${genre}] [Language: ${lang}] ${lyrics}`;
+
+        try {
+            const response = await fetch("https://api-inference.huggingface.co/models/suno/bark-small", {
+                headers: { 
+                    Authorization: `Bearer ${API_KEY}`,
+                    "Content-Type": "application/json"
+                },
+                method: "POST",
+                body: JSON.stringify({ inputs: fullPrompt }),
+            });
+
+            if (!response.ok) {
+                if (response.status === 503) {
+                    throw new Error("AI Model load ho raha hai... 15 sec baad phir TRY AGAIN dabayein.");
+                } else {
+                    throw new Error("API Limit or Server busy. Please try again.");
+                }
+            }
+
+            const blob = await response.blob();
+            const audioUrl = URL.createObjectURL(blob);
+
+            audioPlayer.src = audioUrl;
+            audioPlayer.style.display = "block";
             audioPlayer.play();
 
-            // Show Reset Button to allow creating another song
-            resetBtn.style.display = 'block';
-        }, 3000);
+            statusText.innerText = "Song Ready! Tap play below 🔥";
+            generateBtn.innerText = "SONG CREATED!";
+            resetBtn.style.display = "block";
+
+        } catch (error) {
+            console.error(error);
+            statusText.innerText = "Error: " + error.message;
+            generateBtn.innerText = "TRY AGAIN";
+            generateBtn.disabled = false;
+        }
     }
 
     function resetApp() {
@@ -172,7 +217,7 @@
 
         const generateBtn = document.getElementById('generateBtn');
         generateBtn.disabled = false;
-        generateBtn.innerText = 'GENERATE FULL SONG';
+        generateBtn.innerText = 'GENERATE AI SONG 🎤';
 
         document.getElementById('statusText').innerText = '';
         document.getElementById('resetBtn').style.display = 'none';
