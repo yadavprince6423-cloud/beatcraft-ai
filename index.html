@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeatCraft AI - Real AI Song Generator</title>
+    <title>BeatCraft AI - Real Beat & Vocal Generator</title>
     <style>
         * {
             box-sizing: border-box;
@@ -110,8 +110,15 @@
         }
         audio {
             width: 100%;
-            margin-top: 20px;
+            margin-top: 15px;
+        }
+        .audio-box {
+            margin-top: 15px;
             display: none;
+            background: #0d0f17;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #2a2f4c;
         }
     </style>
 </head>
@@ -125,32 +132,48 @@
 
     <label for="genreSelect">🎶 Song Type (Gana kaisa chahiye):</label>
     <select id="genreSelect">
-        <option value="hiphop"> Hip-Hop / Rap</option>
-        <option value="sad"> Sad Song</option>
+        <option value="hiphop">🔥 Hip-Hop / Rap Beat</option>
+        <option value="sad">💔 Sad Emotional Music</option>
     </select>
 
     <label for="langSelect">🗣️ Language (Bhasha select karein):</label>
     <select id="langSelect">
         <option value="hi">🇮🇳 Hindi</option>
-        <option value="en"> English</option>
+        <option value="en">🇬🇧 English</option>
     </select>
 
-    <button id="generateBtn" onclick="generateAISong()">GENERATE AI SONG 🎤</button>
+    <button id="generateBtn" onclick="generateAISong()">GENERATE AI SONG WITH MUSIC 🎤</button>
     <button id="resetBtn" class="btn-reset" onclick="resetApp()">🔄 Create Another Song</button>
 
     <div id="statusText" class="status"></div>
-    <audio id="audioPlayer" controls></audio>
+
+    <div id="audioBox" class="audio-box">
+        <label>🎤 Vocals (Aawaaz):</label>
+        <audio id="vocalPlayer" controls></audio>
+        
+        <label>🥁 Background Music (Beat):</label>
+        <audio id="beatPlayer" controls loop></audio>
+    </div>
 </div>
 
 <script>
+    // Free Royalty-Free Background Beats Links
+    const beats = {
+        hiphop: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        sad: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+    };
+
     async function generateAISong() {
         const lyrics = document.getElementById('lyricsInput').value.trim();
         const lang = document.getElementById('langSelect').value;
+        const genre = document.getElementById('genreSelect').value;
 
         const generateBtn = document.getElementById('generateBtn');
         const resetBtn = document.getElementById('resetBtn');
         const statusText = document.getElementById('statusText');
-        const audioPlayer = document.getElementById('audioPlayer');
+        const vocalPlayer = document.getElementById('vocalPlayer');
+        const beatPlayer = document.getElementById('beatPlayer');
+        const audioBox = document.getElementById('audioBox');
 
         if (!lyrics) {
             alert('Bhai pehle lyrics toh daalo!');
@@ -158,28 +181,35 @@
         }
 
         generateBtn.disabled = true;
-        generateBtn.innerText = 'AI Singer Processing... 🎤';
-        statusText.innerText = 'Generating audio track...';
+        generateBtn.innerText = 'Mixing Vocals & Beat... 🎤';
+        statusText.innerText = 'Generating full song track...';
 
         try {
-            // Clean lyrics for clean audio synthesis
             const cleanText = lyrics.replace(/\(Verse \d+\)/gi, '').replace(/\(Chorus\)/gi, '').trim();
             const encodedText = encodeURIComponent(cleanText);
             
-            // Fast reliable audio speech/vocal stream
-            const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=${lang}&client=tw-ob`;
+            // Vocal Audio Link
+            const vocalUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=${lang}&client=tw-ob`;
 
-            audioPlayer.src = audioUrl;
-            audioPlayer.style.display = "block";
-            await audioPlayer.play();
+            vocalPlayer.src = vocalUrl;
+            beatPlayer.src = beats[genre];
 
-            statusText.innerText = "Song Vocal Ready! Tap play below 🔥";
+            audioBox.style.display = "block";
+
+            // Play both together
+            beatPlayer.volume = 0.4; // Beat volume thodi halki rakhi hai taaki vocals saaf sune
+            vocalPlayer.volume = 1.0;
+
+            await beatPlayer.play();
+            await vocalPlayer.play();
+
+            statusText.innerText = "Song & Music Playing Together! 🔥";
             generateBtn.innerText = "SONG CREATED!";
             resetBtn.style.display = "block";
 
         } catch (error) {
             console.error(error);
-            statusText.innerText = "Error playing audio. Please try again with shorter lyrics!";
+            statusText.innerText = "Tap play button on players below to listen!";
             generateBtn.innerText = "TRY AGAIN";
             generateBtn.disabled = false;
         }
@@ -187,15 +217,17 @@
 
     function resetApp() {
         document.getElementById('lyricsInput').value = '';
-        const audioPlayer = document.getElementById('audioPlayer');
+        const vocalPlayer = document.getElementById('vocalPlayer');
+        const beatPlayer = document.getElementById('beatPlayer');
         
-        audioPlayer.pause();
-        audioPlayer.currentTime = 0;
-        audioPlayer.style.display = 'none';
+        vocalPlayer.pause();
+        beatPlayer.pause();
+        
+        document.getElementById('audioBox').style.display = 'none';
 
         const generateBtn = document.getElementById('generateBtn');
         generateBtn.disabled = false;
-        generateBtn.innerText = 'GENERATE AI SONG 🎤';
+        generateBtn.innerText = 'GENERATE AI SONG WITH MUSIC 🎤';
 
         document.getElementById('statusText').innerText = '';
         document.getElementById('resetBtn').style.display = 'none';
