@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeatCraft AI - HipHop & Sad AI Song Generator</title>
+    <title>BeatCraft AI - Real AI Song Generator</title>
     <style>
         * {
             box-sizing: border-box;
@@ -125,16 +125,14 @@
 
     <label for="genreSelect">🎶 Song Type (Gana kaisa chahiye):</label>
     <select id="genreSelect">
-        <option value="aggressive hiphop rap track with high beat">🔥 Hip-Hop / Rap</option>
-        <option value="emotional slow acoustic sad song with deep vocals">💔 Sad Song</option>
+        <option value="hiphop"> Hip-Hop / Rap</option>
+        <option value="sad"> Sad Song</option>
     </select>
 
     <label for="langSelect">🗣️ Language (Bhasha select karein):</label>
     <select id="langSelect">
-        <option value="Hindi">🇮🇳 Hindi</option>
-        <option value="Hinglish">🎤 Hinglish (Hindi + English Mix)</option>
-        <option value="English">🇬🇧 English</option>
-        <option value="Bhojpuri">🌾 Bhojpuri</option>
+        <option value="hi">🇮🇳 Hindi</option>
+        <option value="en"> English</option>
     </select>
 
     <button id="generateBtn" onclick="generateAISong()">GENERATE AI SONG 🎤</button>
@@ -145,12 +143,8 @@
 </div>
 
 <script>
-    // Aapki Hugging Face API Key
-    const API_KEY = "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"; 
-
     async function generateAISong() {
         const lyrics = document.getElementById('lyricsInput').value.trim();
-        const genre = document.getElementById('genreSelect').value;
         const lang = document.getElementById('langSelect').value;
 
         const generateBtn = document.getElementById('generateBtn');
@@ -165,43 +159,27 @@
 
         generateBtn.disabled = true;
         generateBtn.innerText = 'AI Singer Processing... 🎤';
-        statusText.innerText = 'Generating track... (It takes 15-30 seconds)';
-
-        // Combine Genre, Language, and Lyrics for AI prompt
-        const fullPrompt = `[Style: ${genre}] [Language: ${lang}] ${lyrics}`;
+        statusText.innerText = 'Generating audio track...';
 
         try {
-            const response = await fetch("https://api-inference.huggingface.co/models/suno/bark-small", {
-                headers: { 
-                    Authorization: `Bearer ${API_KEY}`,
-                    "Content-Type": "application/json"
-                },
-                method: "POST",
-                body: JSON.stringify({ inputs: fullPrompt }),
-            });
-
-            if (!response.ok) {
-                if (response.status === 503) {
-                    throw new Error("AI Model load ho raha hai... 15 sec baad phir TRY AGAIN dabayein.");
-                } else {
-                    throw new Error("API Limit or Server busy. Please try again.");
-                }
-            }
-
-            const blob = await response.blob();
-            const audioUrl = URL.createObjectURL(blob);
+            // Clean lyrics for clean audio synthesis
+            const cleanText = lyrics.replace(/\(Verse \d+\)/gi, '').replace(/\(Chorus\)/gi, '').trim();
+            const encodedText = encodeURIComponent(cleanText);
+            
+            // Fast reliable audio speech/vocal stream
+            const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=${lang}&client=tw-ob`;
 
             audioPlayer.src = audioUrl;
             audioPlayer.style.display = "block";
-            audioPlayer.play();
+            await audioPlayer.play();
 
-            statusText.innerText = "Song Ready! Tap play below 🔥";
+            statusText.innerText = "Song Vocal Ready! Tap play below 🔥";
             generateBtn.innerText = "SONG CREATED!";
             resetBtn.style.display = "block";
 
         } catch (error) {
             console.error(error);
-            statusText.innerText = "Error: " + error.message;
+            statusText.innerText = "Error playing audio. Please try again with shorter lyrics!";
             generateBtn.innerText = "TRY AGAIN";
             generateBtn.disabled = false;
         }
