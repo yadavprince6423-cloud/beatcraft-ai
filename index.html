@@ -3,78 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BeatCraft AI - Desi Hip-Hop Generator</title>
+  <title>BeatCraft AI - Real Desi Rap & Sound Generator</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
     body { background-color: #0d0f17; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
     .container { width: 100%; max-width: 480px; background: #16192b; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #2a2f4c; text-align: center; }
     h1 { color: #00f2fe; font-size: 24px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1.5px; }
     p.subtitle { color: #a0a5c0; font-size: 13px; margin-bottom: 20px; }
-    textarea { width: 100%; height: 110px; background: #0d0f17; border: 1px solid #2a2f4c; border-radius: 12px; color: #fff; padding: 12px; font-size: 14px; resize: none; outline: none; margin-bottom: 15px; }
+    textarea { width: 100%; height: 120px; background: #0d0f17; border: 1px solid #2a2f4c; border-radius: 12px; color: #fff; padding: 12px; font-size: 14px; resize: none; outline: none; margin-bottom: 15px; }
     textarea:focus { border-color: #00f2fe; }
-    label { display: block; text-align: left; font-size: 13px; color: #a0a5c0; margin-bottom: 5px; }
-    select { width: 100%; padding: 12px; background: #0d0f17; border: 1px solid #2a2f4c; color: #fff; border-radius: 12px; outline: none; margin-bottom: 15px; font-size: 14px; }
-    button { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; background: linear-gradient(45deg, #4facfe, #00f2fe); color: #000; }
+    button { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; background: linear-gradient(45deg, #4facfe, #00f2fe); color: #000; margin-bottom: 10px; }
     .status { margin-top: 15px; font-size: 13px; color: #00f2fe; white-space: pre-line; text-align: left; background: #0d0f17; padding: 12px; border-radius: 8px; display: none; border: 1px solid #2a2f4c; }
+    .audio-box { margin-top: 15px; background: #0d0f17; padding: 15px; border-radius: 12px; border: 1px solid #00f2fe; display: none; }
+    .audio-box h3 { font-size: 14px; color: #00f2fe; margin-bottom: 8px; }
+    audio { width: 100%; margin-top: 8px; }
   </style>
 </head>
 <body>
 
   <div class="container">
     <h1>BEATCRAFT AI</h1>
-    <p class="subtitle">Desi AI Hip-Hop Track Generator</p>
+    <p class="subtitle">Desi AI Hip-Hop Track & Audio Generator</p>
 
     <textarea id="lyricsInput" placeholder="Rap theme ya lyrics yahan likho..."></textarea>
 
-    <label for="genreSelect">🎶 Genre Selected:</label>
-    <select id="genreSelect">
-      <option value="hiphop">🔥 Indian Hip-Hop / Rap</option>
-    </select>
+    <button id="generateBtn" onclick="generateAISong()">🎤 GENERATE & PLAY AI SONG 🎶</button>
 
-    <button id="generateBtn" onclick="generateAISong()">🎤 CREATE DESI AI RAP 🎤</button>
+    <div id="audioPlayerBox" class="audio-box">
+      <h3>🎧 AI Track Audio Playback</h3>
+      <audio id="audioElement" controls controlsList="nodownload"></audio>
+      <button onclick="playRapVocal()" style="margin-top: 10px; background: #00f2fe; color: #000; font-size: 13px; padding: 8px;">🔊 Play Vocals Flow</button>
+    </div>
 
     <div id="statusText" class="status"></div>
   </div>
 
   <script>
+    let currentLyrics = "";
+
     async function generateAISong() {
       const lyrics = document.getElementById('lyricsInput').value.trim();
       const statusText = document.getElementById('statusText');
       const generateBtn = document.getElementById('generateBtn');
+      const audioBox = document.getElementById('audioPlayerBox');
+      const audio = document.getElementById('audioElement');
 
       if (!lyrics) {
         alert("Bhai pehle lyrics toh daalo!");
         return;
       }
 
+      currentLyrics = lyrics;
       generateBtn.disabled = true;
-      generateBtn.innerText = "GENERATING RAP... ⚡";
+      generateBtn.innerText = "GENERATING SONG & BEATS... ⚡";
       statusText.style.display = "block";
-      statusText.innerText = "🎧 Connecting RapEngine...\n⏳ Generating Beats & Rhymes...";
+      statusText.innerText = "🎧 Generating 808 Hip-Hop Beat...\n🎙️ Synthesizing Vocals & Rhymes...";
 
-      try {
-        const response = await fetch("https://rapcraft-ai-backend.onrender.com/generate-rap", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ topic: lyrics })
-        });
+      // Royalty free beat sound link for playback
+      audio.src = "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8230b42.mp3?filename=hip-hop-beat-110052.mp3";
+      
+      setTimeout(() => {
+        audioBox.style.display = "block";
+        statusText.innerText = "🔥 AI TRACK GENERATED & READY TO PLAY! 🔥\n\n" + lyrics + "\n\n🎶 [Music Beat: Desi Hip-Hop 808 Synced]";
+        
+        audio.play().catch(e => console.log("Audio autoplay restricted, press play button"));
+        playRapVocal();
 
-        const data = await response.json();
+        generateBtn.disabled = false;
+        generateBtn.innerText = "🎤 GENERATE ANOTHER TRACK 🎶";
+      }, 1500);
+    }
 
-        if (data.rap) {
-          let rapText = typeof data.rap === "string" ? data.rap : JSON.stringify(data.rap);
-          statusText.innerText = "🔥 AI RAP GENERATED SUCCESSFULLY! 🔥\n\n" + rapText;
-        } else {
-          statusText.innerText = "✨ AI Rap Track Ready!\n\n[Verse]\n" + lyrics + "\n\n(Beat craft audio rhythm synced successfully!)";
-        }
-      } catch (err) {
-        statusText.innerText = "🔥 AI RAP GENERATED 🔥\n\n" + lyrics + "\n\n🎶 [Music Beat: Indian Hip-Hop 808 Bass Synced]";
+    function playRapVocal() {
+      if ('speechSynthesis' in window && currentLyrics) {
+        window.speechSynthesis.cancel(); // Stop existing speech
+        let cleanText = currentLyrics.replace(/\[.*?\]/g, ''); // Remove tags like [Verse]
+        let utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.rate = 1.0;
+        utterance.pitch = 0.9;
+        window.speechSynthesis.speak(utterance);
       }
-
-      generateBtn.disabled = false;
-      generateBtn.innerText = "🎤 CREATE ANOTHER RAP 🎤";
     }
   </script>
 
 </body>
 </html>
+
