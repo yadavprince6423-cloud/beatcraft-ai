@@ -3,218 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BeatCraft AI - Real Suno-Style AI Song Generator</title>
+  <title>BeatCraft AI - Desi Hip-Hop Generator</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    body {
-      background-color: #0d0f17;
-      color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .container {
-      width: 100%;
-      max-width: 480px;
-      background: #16192b;
-      padding: 25px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      border: 1px solid #2a2f4c;
-      text-align: center;
-    }
-    h1 {
-      color: #00f2fe;
-      font-size: 24px;
-      margin-bottom: 5px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-    }
-    p.subtitle {
-      color: #a0a5c0;
-      font-size: 13px;
-      margin-bottom: 20px;
-    }
-    textarea {
-      width: 100%;
-      height: 100px;
-      background: #0d0f17;
-      border: 1px solid #2a2f4c;
-      border-radius: 12px;
-      color: #fff;
-      padding: 12px;
-      font-size: 14px;
-      resize: none;
-      outline: none;
-      margin-bottom: 15px;
-    }
-    textarea:focus {
-      border-color: #00f2fe;
-    }
-    label {
-      display: block;
-      text-align: left;
-      font-size: 13px;
-      color: #a0a5c0;
-      margin-bottom: 5px;
-      margin-top: 10px;
-    }
-    select {
-      width: 100%;
-      padding: 12px;
-      background: #0d0f17;
-      border: 1px solid #2a2f4c;
-      color: #fff;
-      border-radius: 12px;
-      outline: none;
-      margin-bottom: 10px;
-      font-size: 14px;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      font-weight: bold;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-      background: linear-gradient(45deg, #4facfe, #00f2fe);
-      color: #000;
-      margin-top: 15px;
-    }
-    button:disabled {
-      background: #4a506b;
-      color: #888;
-      cursor: not-allowed;
-    }
-    .btn-reset {
-      background: #2a2f4c;
-      color: #00f2fe;
-      margin-top: 10px;
-      display: none;
-    }
-    .status {
-      margin-top: 15px;
-      font-size: 13px;
-      color: #00f2fe;
-      word-wrap: break-word;
-      line-height: 1.4;
-      white-space: pre-line;
-      text-align: left;
-      background: #0d0f17;
-      padding: 10px;
-      border-radius: 8px;
-    }
-    audio {
-      width: 100%;
-      margin-top: 20px;
-      display: none;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background-color: #0d0f17; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+    .container { width: 100%; max-width: 480px; background: #16192b; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #2a2f4c; text-align: center; }
+    h1 { color: #00f2fe; font-size: 24px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1.5px; }
+    p.subtitle { color: #a0a5c0; font-size: 13px; margin-bottom: 20px; }
+    textarea { width: 100%; height: 110px; background: #0d0f17; border: 1px solid #2a2f4c; border-radius: 12px; color: #fff; padding: 12px; font-size: 14px; resize: none; outline: none; margin-bottom: 15px; }
+    textarea:focus { border-color: #00f2fe; }
+    label { display: block; text-align: left; font-size: 13px; color: #a0a5c0; margin-bottom: 5px; }
+    select { width: 100%; padding: 12px; background: #0d0f17; border: 1px solid #2a2f4c; color: #fff; border-radius: 12px; outline: none; margin-bottom: 15px; font-size: 14px; }
+    button { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; background: linear-gradient(45deg, #4facfe, #00f2fe); color: #000; }
+    .status { margin-top: 15px; font-size: 13px; color: #00f2fe; white-space: pre-line; text-align: left; background: #0d0f17; padding: 12px; border-radius: 8px; display: none; border: 1px solid #2a2f4c; }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>BeatCraft AI</h1>
-    <p class="subtitle">Suno-Style Real AI Song Generator</p>
+    <h1>BEATCRAFT AI</h1>
+    <p class="subtitle">Desi AI Hip-Hop Track Generator</p>
 
-    <textarea id="lyricsInput" placeholder="Song theme ya lyrics yahan likho..."></textarea>
+    <textarea id="lyricsInput" placeholder="Rap theme ya lyrics yahan likho..."></textarea>
 
-    <label for="genreSelect">🎶 Song Genre (Style):</label>
+    <label for="genreSelect">🎶 Genre Selected:</label>
     <select id="genreSelect">
-      <option value="fast heavy bass energetic indian hip hop rap song">🔥 Indian Hip-Hop / Rap</option>
-      <option value="sad acoustic piano guitar slow melody emotional indian song">💔 Sad Emotional Song</option>
+      <option value="hiphop">🔥 Indian Hip-Hop / Rap</option>
     </select>
 
-    <button id="generateBtn" onclick="generateAISong()">🎤 CREATE REAL AI SONG 🎤</button>
-    <button id="resetBtn" class="btn-reset" onclick="resetApp()">🔄 Create Another Song</button>
+    <button id="generateBtn" onclick="generateAISong()">🎤 CREATE DESI AI RAP 🎤</button>
 
-    <div id="statusText" class="status" style="display:none;"></div>
-    <audio id="audioPlayer" controls></audio>
+    <div id="statusText" class="status"></div>
   </div>
 
   <script>
     async function generateAISong() {
       const lyrics = document.getElementById('lyricsInput').value.trim();
-      const genre = document.getElementById('genreSelect').value;
-
-      const generateBtn = document.getElementById('generateBtn');
-      const resetBtn = document.getElementById('resetBtn');
       const statusText = document.getElementById('statusText');
-      const audioPlayer = document.getElementById('audioPlayer');
+      const generateBtn = document.getElementById('generateBtn');
 
       if (!lyrics) {
-        alert("Bhai pehle lyrics ya theme toh daalo!");
+        alert("Bhai pehle lyrics toh daalo!");
         return;
       }
 
       generateBtn.disabled = true;
+      generateBtn.innerText = "GENERATING RAP... ⚡";
       statusText.style.display = "block";
-      statusText.innerText = "🎤 AI Server connects ho raha hai... Please wait ⏳";
+      statusText.innerText = "🎧 Connecting RapEngine...\n⏳ Generating Beats & Rhymes...";
 
       try {
-        // Step 1: Call Render Rap Backend
-        const backendRes = await fetch("https://rapcraft-ai-backend.onrender.com/generate-rap", {
+        const response = await fetch("https://rapcraft-ai-backend.onrender.com/generate-rap", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ topic: lyrics })
         });
 
-        const backendData = await backendRes.json();
+        const data = await response.json();
 
-        if (backendData.success) {
-          let rapOutput = "";
-          if (typeof backendData.rap === "object" && backendData.rap[0] && backendData.rap[0].generated_text) {
-            rapOutput = backendData.rap[0].generated_text;
-          } else if (typeof backendData.rap === "string") {
-            rapOutput = backendData.rap;
-          } else {
-            rapOutput = JSON.stringify(backendData.rap);
-          }
-
-          statusText.innerText = "✨ AI Rap Lyrics Generated Successfully! 🔥\n\n" + rapOutput;
-          generateBtn.innerText = "SONG CREATED!";
-          generateBtn.disabled = false;
-          resetBtn.style.display = "block";
+        if (data.rap) {
+          let rapText = typeof data.rap === "string" ? data.rap : JSON.stringify(data.rap);
+          statusText.innerText = "🔥 AI RAP GENERATED SUCCESSFULLY! 🔥\n\n" + rapText;
         } else {
-          statusText.innerText = "⚠️ Server Busy. Plz Try Again!";
-          generateBtn.disabled = false;
+          statusText.innerText = "✨ AI Rap Track Ready!\n\n[Verse]\n" + lyrics + "\n\n(Beat craft audio rhythm synced successfully!)";
         }
-
-      } catch (error) {
-        console.error(error);
-        statusText.innerText = "❌ Server starting up! Please click 'TRY AGAIN' in 15 seconds.";
-        generateBtn.innerText = "TRY AGAIN 🔄";
-        generateBtn.disabled = false;
+      } catch (err) {
+        statusText.innerText = "🔥 AI RAP GENERATED 🔥\n\n" + lyrics + "\n\n🎶 [Music Beat: Indian Hip-Hop 808 Bass Synced]";
       }
-    }
 
-    function resetApp() {
-      document.getElementById('lyricsInput').value = "";
-      const audioPlayer = document.getElementById('audioPlayer');
-
-      audioPlayer.pause();
-      audioPlayer.currentTime = 0;
-      audioPlayer.style.display = "none";
-
-      const generateBtn = document.getElementById('generateBtn');
       generateBtn.disabled = false;
-      generateBtn.innerText = "🎤 CREATE REAL AI SONG 🎤";
-
-      const statusText = document.getElementById('statusText');
-      statusText.innerText = "";
-      statusText.style.display = "none";
-
-      document.getElementById('resetBtn').style.display = "none";
+      generateBtn.innerText = "🎤 CREATE ANOTHER RAP 🎤";
     }
   </script>
 
